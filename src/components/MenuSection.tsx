@@ -1,0 +1,196 @@
+import { Flame, Plus, ShoppingCart } from "lucide-react";
+import { useState } from "react";
+import { useCart } from "@/context/CartContext";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+// Menu item images
+import chickenReshmiImg from "@/assets/menu/chicken-reshmi-kabab.jpg";
+import balochiTikkaImg from "@/assets/menu/balochi-tikka.jpg";
+import malaiBotiImg from "@/assets/menu/malai-boti.jpg";
+import chickenSeekhImg from "@/assets/menu/chicken-seekh-kebab.jpg";
+import smokyBeefImg from "@/assets/menu/smoky-beef-gola.jpg";
+import chandanImg from "@/assets/menu/chandan-kabab.jpg";
+import grilledRahuImg from "@/assets/menu/grilled-rahu.jpg";
+import fryRahuImg from "@/assets/menu/fry-rahu.jpg";
+import roghniNaanImg from "@/assets/menu/roghni-naan.jpg";
+import cheeseNaanImg from "@/assets/menu/cheese-naan.jpg";
+import plainRotiImg from "@/assets/menu/plain-roti.jpg";
+import qandhariNaanImg from "@/assets/menu/qandhari-naan.jpg";
+import lassiImg from "@/assets/menu/lassi.jpg";
+import softDrinkImg from "@/assets/menu/soft-drink.jpg";
+import mintLemonadeImg from "@/assets/menu/mint-lemonade.jpg";
+import chaiImg from "@/assets/menu/chai.jpg";
+import freshJuiceImg from "@/assets/menu/fresh-juice.jpg";
+
+const categories = ["Bar BQ", "Fish & Prawns", "Tandoor", "Drinks"] as const;
+
+interface MenuItem {
+  name: string;
+  description: string;
+  price: string;
+  ingredients: string[];
+  image: string;
+}
+
+const menuItems: Record<typeof categories[number], MenuItem[]> = {
+  "Bar BQ": [
+    { name: "Chicken Reshmi Kabab", description: "Soft, creamy chicken marinated in spices & grilled for a rich silky flavored", price: "899", ingredients: ["Chicken", "Yogurt", "Cream", "Ginger Garlic Paste", "Green Chilies", "Spices", "Butter"], image: chickenReshmiImg },
+    { name: "Balochi Tikka Full", description: "Full Plate", price: "1,099", ingredients: ["Chicken", "Balochi Spice Mix", "Yogurt", "Lemon", "Papaya Paste", "Red Chili", "Salt"], image: balochiTikkaImg },
+    { name: "Malai Boti Half", description: "Half (One Seekh)", price: "650", ingredients: ["Chicken", "Cream", "Cheese", "Yogurt", "Mild Spices", "Cardamom"], image: malaiBotiImg },
+    { name: "Chicken Seekh Kebab Full Plate", description: "Full Plate", price: "899", ingredients: ["Minced Chicken", "Onions", "Green Chilies", "Coriander", "Ginger", "Spices"], image: chickenSeekhImg },
+    { name: "Chicken Reshmi Kebab Half", description: "Half (One Seekh)", price: "450", ingredients: ["Chicken", "Yogurt", "Cream", "Ginger Garlic Paste", "Spices"], image: chickenReshmiImg },
+    { name: "Balochi Tikka Half", description: "Half (One Seekh)", price: "550", ingredients: ["Chicken", "Balochi Spice Mix", "Yogurt", "Lemon", "Red Chili"], image: balochiTikkaImg },
+    { name: "Chandan Kabab", description: "Tender kabab with a beef, chicken blend & richly spiced", price: "1,099", ingredients: ["Beef", "Chicken", "Onions", "Spices", "Herbs", "Egg", "Gram Flour"], image: chandanImg },
+    { name: "Smoky Beef Gola Kabab", description: "Soft, flavorful beef kabab made with seasoned mince & cooker wet charcoal", price: "1,099", ingredients: ["Beef Mince", "Charcoal", "Onions", "Green Chilies", "Spices", "Coriander"], image: smokyBeefImg },
+    { name: "Malai Boti Full", description: "Juicy chicken cubes marinated in creamy yogurt, cheese, mild spices, grilled for a soft & melt in the mouth flavored", price: "1,299", ingredients: ["Chicken", "Cream", "Cheese", "Yogurt", "Mild Spices", "Cardamom", "Butter"], image: malaiBotiImg },
+  ],
+  "Fish & Prawns": [
+    { name: "Grilled Rahu 0.5 Kg", description: "Grilled Rahu", price: "1,400", ingredients: ["Rahu Fish", "Lemon", "Garlic", "Salt", "Black Pepper", "Herbs"], image: grilledRahuImg },
+    { name: "Fry Rahu 1 Kg", description: "Fry Rahu", price: "2,600", ingredients: ["Rahu Fish", "Gram Flour", "Spices", "Red Chili", "Turmeric", "Oil"], image: fryRahuImg },
+    { name: "Fry Rahu 0.5 Kg", description: "Fry Rahu", price: "1,400", ingredients: ["Rahu Fish", "Gram Flour", "Spices", "Red Chili", "Turmeric", "Oil"], image: fryRahuImg },
+  ],
+  "Tandoor": [
+    { name: "Roghni Naan", description: "Roghni Naan", price: "150", ingredients: ["Flour", "Yeast", "Milk", "Butter", "Sesame Seeds"], image: roghniNaanImg },
+    { name: "Cheese Naan", description: "Cheese Naan", price: "800", ingredients: ["Flour", "Cheese", "Butter", "Yeast", "Milk"], image: cheeseNaanImg },
+    { name: "Plain Roti", description: "Plain Roti", price: "50", ingredients: ["Whole Wheat Flour", "Water", "Salt"], image: plainRotiImg },
+    { name: "Qandhari Naan", description: "Qandhari Naan", price: "150", ingredients: ["Flour", "Yeast", "Dry Fruits", "Sesame", "Butter"], image: qandhariNaanImg },
+  ],
+  "Drinks": [
+    { name: "Lassi", description: "Traditional creamy yogurt drink topped with pistachios", price: "200", ingredients: ["Yogurt", "Sugar", "Cream", "Pistachios", "Cardamom"], image: lassiImg },
+    { name: "Soft Drink", description: "Chilled carbonated beverage", price: "100", ingredients: ["Carbonated Water", "Sugar", "Flavoring"], image: softDrinkImg },
+    { name: "Mint Lemonade", description: "Refreshing iced lemonade with fresh mint", price: "250", ingredients: ["Lemon", "Mint", "Sugar", "Ice", "Soda Water"], image: mintLemonadeImg },
+    { name: "Doodh Patti Chai", description: "Rich Pakistani milk tea brewed to perfection", price: "150", ingredients: ["Tea Leaves", "Milk", "Sugar", "Cardamom"], image: chaiImg },
+    { name: "Fresh Juice", description: "Seasonal fresh fruit juice", price: "300", ingredients: ["Fresh Fruit", "Sugar", "Ice"], image: freshJuiceImg },
+  ],
+};
+
+const MenuSection = () => {
+  const [active, setActive] = useState<typeof categories[number]>("Bar BQ");
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const { addItem, setIsCartOpen } = useCart();
+
+  const handleAddToCart = (item: MenuItem, category: string) => {
+    addItem({ name: item.name, price: item.price, category });
+    toast.success(`${item.name} added to cart!`);
+  };
+
+  return (
+    <section id="menu" className="py-20 bg-fire-dark">
+      <div className="container max-w-6xl mx-auto px-4">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="h-px w-12 bg-accent" />
+          <Flame className="w-5 h-5 text-accent" />
+          <div className="h-px w-12 bg-accent" />
+        </div>
+        <h2 className="font-heading text-4xl md:text-5xl uppercase text-fire-dark-foreground text-center mb-8">
+          Our Menu
+        </h2>
+
+        {/* Category Tabs */}
+        <div className="flex justify-center gap-2 mb-10 flex-wrap">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActive(cat)}
+              className={`font-heading uppercase text-sm md:text-base px-5 py-2 rounded-full border transition-colors ${
+                active === cat
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-fire-dark-foreground/20 text-fire-dark-foreground/70 hover:border-primary/50"
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {menuItems[active].map((item) => (
+            <div
+              key={item.name}
+              className="bg-fire-dark-foreground/5 border border-fire-dark-foreground/10 rounded-lg overflow-hidden hover:border-primary/50 transition-colors group cursor-pointer"
+              onClick={() => setSelectedItem(item)}
+            >
+              {/* Item Image */}
+              <div className="relative h-44 overflow-hidden">
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-fire-dark via-transparent to-transparent" />
+                <span className="absolute bottom-2 right-3 font-heading text-xl text-primary drop-shadow-lg">
+                  Rs{item.price}
+                </span>
+              </div>
+              <div className="p-4">
+                <h3 className="font-heading text-lg uppercase text-fire-dark-foreground group-hover:text-accent transition-colors mb-1">
+                  {item.name}
+                </h3>
+                <p className="text-fire-dark-foreground/60 text-sm mb-3 line-clamp-2">{item.description}</p>
+                <Button
+                  size="sm"
+                  onClick={(e) => { e.stopPropagation(); handleAddToCart(item, active); }}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-heading uppercase text-xs gap-1"
+                >
+                  <Plus className="w-3 h-3" /> Add to Cart
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Item Detail Dialog */}
+      <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
+        <DialogContent className="bg-fire-dark border-fire-dark-foreground/10 text-fire-dark-foreground max-w-md p-0 overflow-hidden">
+          {selectedItem && (
+            <>
+              <div className="relative h-56 overflow-hidden">
+                <img
+                  src={selectedItem.image}
+                  alt={selectedItem.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-fire-dark to-transparent" />
+              </div>
+              <div className="p-6 pt-0 -mt-8 relative">
+                <DialogHeader>
+                  <DialogTitle className="font-heading text-2xl uppercase text-fire-dark-foreground">
+                    {selectedItem.name}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 mt-3">
+                  <div className="flex justify-between items-center">
+                    <span className="font-heading text-2xl text-primary">Rs{selectedItem.price}</span>
+                  </div>
+                  <p className="text-fire-dark-foreground/70">{selectedItem.description}</p>
+                  <div>
+                    <h4 className="font-heading uppercase text-sm text-accent mb-2">Ingredients</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedItem.ingredients.map((ing) => (
+                        <span key={ing} className="text-xs px-3 py-1 rounded-full border border-fire-dark-foreground/20 text-fire-dark-foreground/70">
+                          {ing}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => { handleAddToCart(selectedItem, active); setSelectedItem(null); }}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-heading uppercase gap-2"
+                  >
+                    <ShoppingCart className="w-4 h-4" /> Add to Cart
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+};
+
+export default MenuSection;
