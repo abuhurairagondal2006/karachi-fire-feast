@@ -26,7 +26,12 @@ const HeroSection = () => {
         <p className="text-lg md:text-xl text-fire-dark-foreground/80 mb-8 max-w-2xl mx-auto">
           Delicious, freshly grilled seafood every day!
         </p>
-        <Button variant="hero" size="lg" className="text-lg px-10 py-6">
+        <Button
+          variant="hero"
+          size="lg"
+          className="text-lg px-10 py-6"
+          onClick={() => document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" })}
+        >
           Order Now
         </Button>
       </div>
