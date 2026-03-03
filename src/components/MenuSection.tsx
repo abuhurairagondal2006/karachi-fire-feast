@@ -18,8 +18,13 @@ import roghniNaanImg from "@/assets/menu/roghni-naan.jpg";
 import cheeseNaanImg from "@/assets/menu/cheese-naan.jpg";
 import plainRotiImg from "@/assets/menu/plain-roti.jpg";
 import qandhariNaanImg from "@/assets/menu/qandhari-naan.jpg";
+import lassiImg from "@/assets/menu/lassi.jpg";
+import softDrinkImg from "@/assets/menu/soft-drink.jpg";
+import mintLemonadeImg from "@/assets/menu/mint-lemonade.jpg";
+import chaiImg from "@/assets/menu/chai.jpg";
+import freshJuiceImg from "@/assets/menu/fresh-juice.jpg";
 
-const categories = ["Bar BQ", "Fish & Prawns", "Tandoor"] as const;
+const categories = ["Bar BQ", "Fish & Prawns", "Tandoor", "Drinks"] as const;
 
 interface MenuItem {
   name: string;
@@ -51,6 +56,13 @@ const menuItems: Record<typeof categories[number], MenuItem[]> = {
     { name: "Cheese Naan", description: "Cheese Naan", price: "800", ingredients: ["Flour", "Cheese", "Butter", "Yeast", "Milk"], image: cheeseNaanImg },
     { name: "Plain Roti", description: "Plain Roti", price: "50", ingredients: ["Whole Wheat Flour", "Water", "Salt"], image: plainRotiImg },
     { name: "Qandhari Naan", description: "Qandhari Naan", price: "150", ingredients: ["Flour", "Yeast", "Dry Fruits", "Sesame", "Butter"], image: qandhariNaanImg },
+  ],
+  "Drinks": [
+    { name: "Lassi", description: "Traditional creamy yogurt drink topped with pistachios", price: "200", ingredients: ["Yogurt", "Sugar", "Cream", "Pistachios", "Cardamom"], image: lassiImg },
+    { name: "Soft Drink", description: "Chilled carbonated beverage", price: "100", ingredients: ["Carbonated Water", "Sugar", "Flavoring"], image: softDrinkImg },
+    { name: "Mint Lemonade", description: "Refreshing iced lemonade with fresh mint", price: "250", ingredients: ["Lemon", "Mint", "Sugar", "Ice", "Soda Water"], image: mintLemonadeImg },
+    { name: "Doodh Patti Chai", description: "Rich Pakistani milk tea brewed to perfection", price: "150", ingredients: ["Tea Leaves", "Milk", "Sugar", "Cardamom"], image: chaiImg },
+    { name: "Fresh Juice", description: "Seasonal fresh fruit juice", price: "300", ingredients: ["Fresh Fruit", "Sugar", "Ice"], image: freshJuiceImg },
   ],
 };
 
